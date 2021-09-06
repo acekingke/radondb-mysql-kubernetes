@@ -43,6 +43,7 @@ const (
 	ContainerSlowLogName  = "slowlog"
 	ContainerAuditLogName = "auditlog"
 	ContainerBackupName   = "backup"
+	ContainerBackupJobName	  = "job-backup"
 
 	XBackupPortName = "xtrabackup"
 	XBackupPort     = 8082
