@@ -85,7 +85,13 @@ func (r *BackupReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	jobSyncer := backupSyncer.NewJobSyncer(r.Client, r.Scheme, backup)
 	if err := syncer.Sync(ctx, jobSyncer, r.Recorder); err != nil {
-		return reconcile.Result{}, err
+		backup.UpdateStatusCondition(apiv1alpha1.BackupFailed, corev1.ConditionTrue, "CreateFailure", err.Error())
+		backup.Status.Completed = true
+		if err2 := r.updateBackup(savedBackup, backup); err2 != nil {
+			return reconcile.Result{}, err2
+		}
+		// Do not try again.
+		return reconcile.Result{}, nil
 	}
 
 	if err = r.updateBackup(savedBackup, backup); err != nil {
@@ -131,7 +137,7 @@ func (r *BackupReconciler) clearHistoryJob(ctx context.Context, req ctrl.Request
 		// at first check backup status completed.
 		backup := backup.New(&apiv1alpha1.Backup{})
 		namespacedName := types.NamespacedName{
-			Name:      strings.TrimSuffix(job.Name, "-backup"),
+			Name:      strings.TrimSuffix(job.Name, "-bak"),
 			Namespace: job.Namespace,
 		}
 		if err := r.Get(context.TODO(), namespacedName, backup.Unwrap()); err != nil {
