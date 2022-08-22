@@ -50,3 +50,4 @@ jobs:
     with:
       version: ${{ needs.update_release_draft.outputs.version }}
       upload_url: ${{ needs.update_release_draft.outputs.upload_url }}
+

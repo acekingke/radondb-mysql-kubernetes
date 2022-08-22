@@ -1,0 +1,22 @@
+  
+name: Run Kubernets
+
+on:
+  workflow_dispatch
+jobs:
+  run_k3s:
+    runs-on: ubuntu-latest
+    steps:     
+      - uses: debianmaster/actions-k3s@master
+        id: k3s
+        with:
+          version: 'latest'
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Check out source code
+        uses: actions/checkout@v1
+      - run: |
+          make e2e-local
